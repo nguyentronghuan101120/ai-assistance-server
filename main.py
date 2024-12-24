@@ -4,6 +4,7 @@ import os
 import openai
 from dotenv import load_dotenv
 from fetch_article import fetch_article
+import re
 
 # Load environment variables
 load_dotenv()
@@ -38,11 +39,19 @@ def summarize_article(url):
     article_content = fetch_article(url)
     if article_content:
         print("\nSummarizing article content...")
-        summary_prompt = f"Summarize the following article:\n\n{article_content}"
+        summary_prompt = f"Summarize the following article in its original language, maintaining the tone, context, and key points. Ensure the summary is concise but retains all critical information and does not change the meaning of the original text. Do not translate or alter the language of the article:\n\n{article_content}"
         summary = get_chat_completion(summary_prompt)
         return summary
     else:
         return "Failed to fetch the article content."
+
+def extract_url(text):
+    """
+    Extracts the first URL found in the given text.
+    """
+    url_pattern = re.compile(r'https?://\S+')
+    match = url_pattern.search(text)
+    return match.group(0) if match else None
 
 def main():
     """
@@ -55,14 +64,11 @@ def main():
             print("\nGoodbye!")
             break
 
-        if user_input.lower().startswith("summary "):
-            # Extract URL from the user input
-            article_url = user_input[8:].strip()
-            if article_url:
-                summary = summarize_article(article_url)
-                print("\nArticle Summary:\n", summary)
-            else:
-                print("\nPlease provide a valid URL after 'summary'.")
+        # Extract URL from the user input
+        article_url = extract_url(user_input)
+        if article_url:
+            summary = summarize_article(article_url)
+            print("\nArticle Summary:\n", summary)
         else:
             # Regular chat response
             response = get_chat_completion(user_input)
