@@ -17,7 +17,7 @@ def process_text(text, operation):
     Processes the given text based on the specified operation (e.g., translate or summarize).
     """
     if operation == "translate":
-        target_language = "Spanish"  # Specify the target language
+        target_language = "English"  # Specify the target language
         prompt = f"Translate the following text to {target_language}:\n\n{text}"
     elif operation == "summarize":
         prompt = f"Summarize the following text:\n\n{text}"

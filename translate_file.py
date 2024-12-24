@@ -41,7 +41,7 @@ def translate_file(input_file, output_file, target_language):
         file.write(translated_content)
 
 if __name__ == "__main__":
-    input_file = "path/to/your/input_file.txt"
-    output_file = "path/to/your/output_file.txt"
+    input_file = "input_file.txt"
+    output_file = "output_file.txt"
     target_language = "Spanish"  # Specify the target language
     translate_file(input_file, output_file, target_language)
