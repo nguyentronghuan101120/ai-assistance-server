@@ -8,10 +8,9 @@ def export_code_reg_in_chat(prompt):
     return False
 
 def process_file_code(prompt):
-    completion = client.get_chat_completion(prompt, isStream=False)
+    completion = client.generate_chat_response(prompt, isStream=False)
     if completion:
         export_file_code(completion)
-    return completion
 
 def export_file_code(completion):
     # Extract content between ```python and the first ```

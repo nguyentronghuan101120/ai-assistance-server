@@ -31,8 +31,7 @@ def main():
             
         else:   
             # Regular chat response
-            response = client.get_chat_completion(user_input)
-            print("\nBot:", response)
+            client.generate_chat_response(user_input)
 
 if __name__ == "__main__":
     main()

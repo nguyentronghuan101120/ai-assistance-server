@@ -12,7 +12,7 @@ client = openai.OpenAI(
     api_key=api_key,
 )
 
-def get_chat_completion(prompt, isStream=True):
+def generate_chat_response(prompt, isStream=True):
     """
     Sends a prompt to the OpenAI API and returns the response.
     """
@@ -23,14 +23,17 @@ def get_chat_completion(prompt, isStream=True):
             stream=isStream,
             max_completion_tokens=500,  # Adjust token limit for summaries
         )
-        print("\nBot:")
-
-        if(isStream):    
+        
+        if isStream:
+            list_content = []
             for chunk in completion:
-                print(chunk.choices[0].delta.content or "", end=""), 
+                content = chunk.choices[0].delta.content
+                if content:
+                    list_content.append(content)
+            print(f"\nBot: {''.join(list_content)}")
+            
         else:
             print(completion.choices[0].message.content)
-            return completion.choices[0].message.content
 
     except Exception as e:
         return f"Error generating completion: {e}"
