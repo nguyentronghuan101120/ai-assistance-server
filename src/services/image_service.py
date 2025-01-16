@@ -1,28 +1,55 @@
 import torch
-from diffusers import StableDiffusion3Pipeline, DPMSolverMultistepScheduler
-from PIL import Image as PILImage
+from diffusers import StableDiffusion3Pipeline
+from PIL.Image import Image
 from models.image_models import ImageRequest
+from diffusers import BitsAndBytesConfig, SD3Transformer2DModel
 
-# Set up device selection
-device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
-
-# Load the model pipeline only once and transfer to the selected device
-pipeline = StableDiffusion3Pipeline.from_pretrained(
-    "stabilityai/stable-diffusion-3.5-medium",
-    torch_dtype=torch.float16 if device != "cpu" else torch.float32,  # Use float16 for GPU, float32 for CPU
-    use_safetensors=True,
+# Device setup
+device = (
+    "cuda" if torch.cuda.is_available()
+    else "mps" if torch.backends.mps.is_available()
+    else "cpu"
 )
-pipeline.scheduler = DPMSolverMultistepScheduler.from_config(pipeline.scheduler.config)
-pipeline.to(device)
+torch.backends.cuda.matmul.allow_tf32 = True  # Enable TF32 for performance on CUDA
+model_id = "stabilityai/stable-diffusion-3-medium-diffusers"  # Update to actual path if local
 
-# Enable mixed-precision (autocast) for more efficient computation on supported hardware
-torch.backends.cudnn.benchmark = True  # Use the optimal algorithm for your hardware
 
-async def generate_image(imgRequest: ImageRequest) -> PILImage:
-    # Use mixed precision to speed up computations if available
-    with torch.autocast(device_type=device, dtype=torch.float16 if device != 'cpu' else torch.float32):
-        # Run the inference and generate the image
-        image = pipeline(
+# Load the pipeline lazily
+_pipeline = None
+
+nf4_config = BitsAndBytesConfig(
+    load_in_4bit=True,
+    bnb_4bit_quant_type="nf4",
+    bnb_4bit_compute_dtype=torch.bfloat16
+)
+model_nf4 = SD3Transformer2DModel.from_pretrained(
+    model_id,
+    subfolder="transformer",
+    quantization_config=nf4_config,
+    torch_dtype=torch.bfloat16
+)
+
+def get_pipeline() -> StableDiffusion3Pipeline:
+    global _pipeline
+    if _pipeline is None:
+        try:
+            dtype = torch.bfloat16
+            _pipeline = StableDiffusion3Pipeline.from_pretrained(
+                model_id,
+                torch_dtype=dtype,
+                transformer=model_nf4,
+            )
+            # _pipeline.enable_model_cpu_offload()
+            _pipeline.to(device)
+        except Exception as e:
+            raise RuntimeError(f"Failed to load the model: {e}")
+    return _pipeline
+
+async def generate_image(imgRequest: ImageRequest) -> Image:
+    pipeline = get_pipeline()
+    try:
+        # Generate image based on input request
+        return pipeline(
             prompt=imgRequest.prompt,
             negative_prompt=imgRequest.negative_prompt,
             width=imgRequest.width,
@@ -30,4 +57,5 @@ async def generate_image(imgRequest: ImageRequest) -> PILImage:
             guidance_scale=imgRequest.guidance_scale,
             num_inference_steps=imgRequest.num_inference_steps,
         ).images[0]
-    return image
+    except Exception as e:
+        raise RuntimeError(f"Failed to generate image: {e}")

@@ -10,6 +10,7 @@ from services import image_service
 
 app = FastAPI()
 
+
 origins = ["*"]
 app.add_middleware(
     CORSMiddleware,
