@@ -11,7 +11,7 @@ device = (
     else "cpu"
 )
 torch.backends.cuda.matmul.allow_tf32 = True  # Enable TF32 for performance on CUDA
-model_id = "Lykon/dreamshaper-xl-v2-turbo"  # Update to actual path if local
+model_id = "stabilityai/stable-diffusion-xl-base-0.9"  # Update to actual path if local
 
 
 # Load the pipeline lazily
@@ -29,6 +29,7 @@ def get_pipeline() -> AutoPipelineForText2Image:
                 use_safetensors=True
             )
             _pipeline.scheduler = DPMSolverMultistepScheduler.from_config(_pipeline.scheduler.config)
+            # _pipeline.enable_model_cpu_offload()
             _pipeline.to(device)
         except Exception as e:
             raise RuntimeError(f"Failed to load the model: {e}")
