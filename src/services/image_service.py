@@ -1,8 +1,8 @@
 import torch
-from diffusers import StableDiffusion3Pipeline
+from diffusers import AutoPipelineForText2Image, DPMSolverMultistepScheduler
 from PIL.Image import Image
 from models.image_models import ImageRequest
-from diffusers import BitsAndBytesConfig, SD3Transformer2DModel
+# from diffusers import BitsAndBytesConfig, SD3Transformer2DModel
 
 # Device setup
 device = (
@@ -11,35 +11,24 @@ device = (
     else "cpu"
 )
 torch.backends.cuda.matmul.allow_tf32 = True  # Enable TF32 for performance on CUDA
-model_id = "stabilityai/stable-diffusion-3-medium-diffusers"  # Update to actual path if local
+model_id = "Lykon/dreamshaper-xl-v2-turbo"  # Update to actual path if local
 
 
 # Load the pipeline lazily
 _pipeline = None
 
-nf4_config = BitsAndBytesConfig(
-    load_in_4bit=True,
-    bnb_4bit_quant_type="nf4",
-    bnb_4bit_compute_dtype=torch.bfloat16
-)
-model_nf4 = SD3Transformer2DModel.from_pretrained(
-    model_id,
-    subfolder="transformer",
-    quantization_config=nf4_config,
-    torch_dtype=torch.bfloat16
-)
-
-def get_pipeline() -> StableDiffusion3Pipeline:
+def get_pipeline() -> AutoPipelineForText2Image:
     global _pipeline
     if _pipeline is None:
         try:
-            dtype = torch.bfloat16
-            _pipeline = StableDiffusion3Pipeline.from_pretrained(
+            _pipeline = AutoPipelineForText2Image.from_pretrained(
                 model_id,
-                torch_dtype=dtype,
-                transformer=model_nf4,
+                torch_dtype=torch.bfloat16,
+                variant="fp16",
+                safety_checker=True,
+                use_safetensors=True
             )
-            # _pipeline.enable_model_cpu_offload()
+            _pipeline.scheduler = DPMSolverMultistepScheduler.from_config(_pipeline.scheduler.config)
             _pipeline.to(device)
         except Exception as e:
             raise RuntimeError(f"Failed to load the model: {e}")
