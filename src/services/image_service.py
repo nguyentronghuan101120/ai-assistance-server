@@ -1,7 +1,8 @@
 import torch
 from diffusers import AutoPipelineForText2Image, DPMSolverMultistepScheduler
 from PIL.Image import Image
-from models.image_models import ImageRequest
+
+from models.requests.image_request import ImageRequest
 # from diffusers import BitsAndBytesConfig, SD3Transformer2DModel
 
 # Device setup
@@ -46,6 +47,7 @@ async def generate_image(imgRequest: ImageRequest) -> Image:
             height=imgRequest.height,
             guidance_scale=imgRequest.guidance_scale,
             num_inference_steps=imgRequest.num_inference_steps,
+            # generator=torch.Generator(device=device).manual_seed(-1)
         ).images[0]
     except Exception as e:
         raise RuntimeError(f"Failed to generate image: {e}")

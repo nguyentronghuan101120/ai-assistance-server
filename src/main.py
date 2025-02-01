@@ -1,15 +1,13 @@
-from models.image_models import ImageRequest
-import io
-import base64
-from io import BytesIO
 
-from fastapi import FastAPI
-from fastapi.responses import StreamingResponse
+from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from services import image_service
+from fastapi.responses import JSONResponse
+from models.responses.base_response import BaseResponse
+from routes import chat_routes, image_routes
+from utils.exception import CustomException
 
 app = FastAPI()
-
 
 origins = ["*"]
 app.add_middleware(
@@ -20,33 +18,31 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.exception_handler(CustomException)
+async def custom_exception_handler(request: Request, exc: CustomException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content=BaseResponse(status_code=exc.status_code, message=exc.message).model_dump(),  
+    )
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    # Mặc định cho các lỗi không được CustomException xử lý
+    return JSONResponse(
+        status_code=500,
+        content=BaseResponse(status_code=500, message=str(exc)).model_dump()
+    )
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    return JSONResponse(
+        status_code=422,
+        content=BaseResponse(status_code=422, message="Validation error").model_dump()
+    )
+    
+app.include_router(chat_routes.router, prefix="/api/v1")
+app.include_router(image_routes.router, prefix="/api/v1")
+
 @app.get("/")
 def read_root():
-    return {"message": "Welcome to Stable Diffusers API"}
-
-
-@app.post("/api/v1/generate/")
-async def generate_image(imgRequest: ImageRequest):
-    # Gọi hàm generate_image để tạo ảnh
-    image = await image_service.generate_image(imgRequest=imgRequest)
-
-    # Chuyển ảnh thành memory_stream để gửi về client
-    memory_stream = io.BytesIO()
-    image.save(memory_stream, format="PNG")
-    memory_stream.seek(0)
-
-    # API trả về một ảnh PNG, media type "image/png"
-    return StreamingResponse(memory_stream, media_type="image/png")
-
-
-@app.post("/api/v1/generatebase64/")
-async def generate_base64_image(imgRequest: ImageRequest):
-    # Gọi hàm generate_image để tạo ảnh
-    image = await image_service.generate_image(imgRequest=imgRequest)
-
-    # Chuyển ảnh thành base64 để gửi về client
-    buffered = BytesIO()
-    image.save(buffered, format="JPEG")
-    img_str = base64.b64encode(buffered.getvalue())
-    # API trả về một ảnh base64
-    return {"image": img_str}
+    return {"message": "Welcome my API"}
