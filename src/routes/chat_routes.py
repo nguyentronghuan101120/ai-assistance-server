@@ -3,7 +3,7 @@ from fastapi.responses import StreamingResponse
 from models.requests.chat_request import ChatRequest
 from models.responses.base_response import BaseResponse
 from services import chat_service
-from utils import client
+from utils import chat_client
 
 router = APIRouter()
 

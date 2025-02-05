@@ -1,6 +1,6 @@
 from fastapi.responses import StreamingResponse
 from models.requests.chat_request import ChatRequest
-from utils import client
+from utils import chat_client
 
 async def chat_generate(request: ChatRequest) -> str:
     """
@@ -14,7 +14,7 @@ async def chat_generate(request: ChatRequest) -> str:
     """
     # Tạo async generator để gửi dữ liệu từng phần
     async def event_generator():
-        async for chunk in client.generate_chat_stream(request.prompt):
+        async for chunk in chat_client.generate_chat_stream(request.prompt):
             yield chunk  # Gửi từng phần của dữ liệu
 
     # Trả về StreamingResponse với generator và media_type phù hợp
@@ -28,4 +28,4 @@ async def get_model_info() -> dict:
         dict: The model information.
     """
     
-    return client.get_model_info()
+    return chat_client.get_model_info()
