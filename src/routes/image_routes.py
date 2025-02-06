@@ -9,14 +9,32 @@ router = APIRouter()
 
 @router.post("/generate/")
 async def generate_image(imgRequest: ImageRequest):
+    """
+    Generate and return an image as a PNG stream.
+    
+    Args:
+        imgRequest (ImageRequest): The request containing image generation parameters
+        
+    Returns:
+        StreamingResponse: A streaming response containing the generated PNG image
+    """
     image = await image_service.generate_image(imgRequest=imgRequest)
     memory_stream = io.BytesIO()
     image.save(memory_stream, format="PNG")
     memory_stream.seek(0)
     return StreamingResponse(memory_stream, media_type="image/png")
 
-@router.post("/generatebase64/")
+@router.post("/generatebase64/") 
 async def generate_base64_image(imgRequest: ImageRequest):
+    """
+    Generate an image and return it as a base64 encoded JPEG string.
+    
+    Args:
+        imgRequest (ImageRequest): The request containing image generation parameters
+        
+    Returns:
+        dict: A dictionary containing the base64 encoded image string under the 'image' key
+    """
     image = await image_service.generate_image(imgRequest=imgRequest)
     buffered = io.BytesIO()
     image.save(buffered, format="JPEG")
