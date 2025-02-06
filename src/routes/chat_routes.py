@@ -1,30 +1,32 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
+from fastapi.responses import StreamingResponse
 from models.requests.chat_request import ChatRequest
 from models.responses.base_response import BaseResponse
 from services import chat_service
 
-router = APIRouter()
+router = APIRouter(tags=["Chat"])
 
-@router.post("/chat/", response_model=None)
+@router.post("/chat/", response_model=BaseResponse, summary="Generate complete chat response")
 async def chat(request: ChatRequest):
     """
-    Generate a chat response for the given prompt.
-    This endpoint yields the response data directly.
+    Generate a complete chat response based on the given prompt.
 
     Args:
         request (ChatRequest): The chat request containing the prompt.
 
-    Yields:
-        The generated chat response data.
+    Returns:
+        BaseResponse: The complete chat response wrapped in a BaseResponse.
     """
-    data = await chat_service.chat_generate(request=request)
-    yield data
-    
-@router.post("/chat/stream", response_model=None)  
+    try:
+        data = await chat_service.chat_generate(request=request)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    return BaseResponse(data=data)
+
+@router.post("/chat/stream", summary="Stream chat response", response_model_exclude_unset=True)
 async def chat_stream(request: ChatRequest):
     """
-    Stream a chat response based on the given prompt.
-    This endpoint returns a StreamingResponse for real-time chat generation.
+    Stream a chat response based on the given prompt for real-time updates.
 
     Args:
         request (ChatRequest): The chat request containing the prompt.
@@ -32,18 +34,22 @@ async def chat_stream(request: ChatRequest):
     Returns:
         StreamingResponse: A stream of the generated chat response.
     """
-    return await chat_service.chat_generate(request=request)
-    
-@router.get("/get-model-info/")
+    try:
+        response = await chat_service.chat_generate(request=request)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    return response
+
+@router.get("/get-model-info/", response_model=BaseResponse, summary="Retrieve model information")
 async def get_model_info():
     """
-    Get information about the currently loaded chat model.
-    Returns details like model name and version.
+    Retrieve information about the currently loaded chat model.
 
     Returns:
-        BaseResponse: A response containing the model information in the data field.
+        BaseResponse: A response containing the model information.
     """
-    data = await chat_service.get_model_info()
-    return BaseResponse(
-        data=data,
-    )
+    try:
+        data = await chat_service.get_model_info()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    return BaseResponse(data=data)

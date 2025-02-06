@@ -22,7 +22,7 @@ app.add_middleware(
 async def custom_exception_handler(request: Request, exc: CustomException):
     return JSONResponse(
         status_code=exc.status_code,
-        content=BaseResponse(status_code=exc.status_code, message=exc.message).model_dump(),  
+        content=BaseResponse(status_code=exc.status_code, message=exc.message).model_dump(),
     )
 
 @app.exception_handler(Exception)
@@ -39,10 +39,11 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         status_code=422,
         content=BaseResponse(status_code=422, message="Validation error").model_dump()
     )
-    
+
 app.include_router(chat_routes.router, prefix="/api/v1")
 app.include_router(image_routes.router, prefix="/api/v1")
-
 @app.get("/")
 def read_root():
     return {"message": "Welcome my API"}
+
+# Define a route for the root path ('/') that returns a JSON response with a welcome message
