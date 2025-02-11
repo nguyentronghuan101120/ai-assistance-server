@@ -1,13 +1,13 @@
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
-from models.requests.chat_request import ChatRequest
+from models.requests.chat_request import ChatRequest, ChatStreamRequest
 from models.responses.base_response import BaseResponse
 from services import chat_service
 
 router = APIRouter(tags=["Chat"])
 
 @router.post("/chat/", response_model=BaseResponse, summary="Generate complete chat response")
-async def chat(request: ChatRequest):
+def chat(request: ChatRequest):
     """
     Generate a complete chat response based on the given prompt.
 
@@ -18,13 +18,13 @@ async def chat(request: ChatRequest):
         BaseResponse: The complete chat response wrapped in a BaseResponse.
     """
     try:
-        data = await chat_service.chat_generate(request=request)
+        data =  chat_service.chat_generate(request=request)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     return BaseResponse(data=data)
 
 @router.post("/chat/stream", summary="Stream chat response", response_model_exclude_unset=True)
-async def chat_stream(request: ChatRequest):
+async def chat_stream(request: ChatStreamRequest):
     """
     Stream a chat response based on the given prompt for real-time updates.
 
@@ -35,10 +35,10 @@ async def chat_stream(request: ChatRequest):
         StreamingResponse: A stream of the generated chat response.
     """
     try:
-        response = await chat_service.chat_generate(request=request)
+        response = chat_service.chat_generate_stream(request=request)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    return response
+    return StreamingResponse(response, media_type='text/event-stream')
 
 @router.get("/get-model-info/", response_model=BaseResponse, summary="Retrieve model information")
 async def get_model_info():

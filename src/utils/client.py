@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Initialize OpenAI API client
-client = openai.OpenAI(
+openai_client = openai.OpenAI(
     base_url="http://localhost:1234/v1",
     api_key="none",
 )

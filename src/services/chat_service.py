@@ -1,51 +1,64 @@
-from fastapi.responses import StreamingResponse
-from models.requests.chat_request import ChatRequest
-from utils import client
-from typing import Union
+from typing import AsyncGenerator
+from models.requests.chat_request import ChatRequest, ChatStreamRequest
+from utils import function_tools
+from utils.client import openai_client
 
-async def chat_generate(request: ChatRequest) -> Union[StreamingResponse, str]:
+
+def chat_generate(request: ChatRequest) -> str:
     """
-    Generate a chat response based on the given prompt.
-
-    If streaming is enabled, returns a StreamingResponse for live updates.
-    Otherwise, returns the complete response as a string.
+    Generate a complete chat response based on the given prompt.
 
     Args:
-        request (ChatRequest): The chat request containing the prompt and streaming flag.
+        request (ChatRequest): The chat request containing the prompt.
 
     Returns:
-        Union[StreamingResponse, str]: The generated chat response.
+        str: The generated chat response as a string.
     """
-    if request.is_stream:
-        async def event_generator():
-            # Stream the chat response in chunks
-            stream = client.client.chat.completions.create(
-                messages=[{"role": "user", "content": request.prompt}],
-                model='',
-                stream=True,
-            )
-            for chunk in stream:
-                content = chunk.choices[0].delta.content
-                if content:
-                    yield content
-        return StreamingResponse(event_generator(), media_type='text/event-stream')
-    else:
-        # Non-streaming: await the complete response
-        completion =  client.client.chat.completions.create(
-            messages=[{"role": "user", "content": request.prompt}],
-            model='',
-            stream=False,
+    completion = openai_client.chat.completions.create(
+        messages=request.prompt,
+        model='',  # Specify the model name before using
+        stream=False,
+        tools=function_tools.tools  # Uncomment if tools are required
+    )
+    
+    # Ensure choices exist before accessing message content
+    return completion.choices[0].message.content if completion.choices else ""
+
+
+def chat_generate_stream(request: ChatStreamRequest) -> AsyncGenerator[str, None]:
+    """
+    Generate a chat response in a streaming manner.
+
+    Args:
+        request (ChatStreamRequest): The chat request containing the prompt.
+
+    Returns:
+        AsyncGenerator[str, None]: An asynchronous generator yielding response chunks.
+    """
+    async def event_generator():
+        # Streaming chat response in chunks
+        stream = openai_client.chat.completions.create(
+            messages=request.prompt,
+            model='',  # Specify the model name before using
+            stream=True,
+            tools=function_tools.tools  # Uncomment if tools are required
         )
-        return completion.choices[0].message.content
+        for chunk in stream:
+            content = chunk.choices[0].delta.content
+            if content:
+                yield content
+
+    return event_generator()
+
 
 async def get_model_info() -> dict:
     """
-    Get the model information.
+    Retrieve information about the currently loaded chat model.
 
     Returns:
-        dict: The model information.
+        dict: A dictionary containing the model's name and version.
     """
     return {
-        "model_name": "GPT-2",
+        "model_name": "GPT-2",  # Update with actual model name if different
         "model_version": "1.0.0"
     }
