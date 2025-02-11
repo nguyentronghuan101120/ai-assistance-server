@@ -19,18 +19,19 @@ async def chat_generate(request: ChatRequest) -> Union[StreamingResponse, str]:
     if request.is_stream:
         async def event_generator():
             # Stream the chat response in chunks
-            async for chunk in client.client.chat.completions.create(
+            stream = client.client.chat.completions.create(
                 messages=[{"role": "user", "content": request.prompt}],
                 model='',
                 stream=True,
-            ):
+            )
+            for chunk in stream:
                 content = chunk.choices[0].delta.content
                 if content:
                     yield content
         return StreamingResponse(event_generator(), media_type='text/event-stream')
     else:
         # Non-streaming: await the complete response
-        completion = await client.client.chat.completions.create(
+        completion =  client.client.chat.completions.create(
             messages=[{"role": "user", "content": request.prompt}],
             model='',
             stream=False,

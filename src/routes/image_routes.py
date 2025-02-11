@@ -3,6 +3,7 @@ import io
 from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
 from models.requests.image_request import ImageRequest
+from models.responses.base_response import BaseResponse
 from services import image_service
 
 router = APIRouter()
@@ -39,4 +40,4 @@ async def generate_base64_image(imgRequest: ImageRequest):
     buffered = io.BytesIO()
     image.save(buffered, format="JPEG")
     img_str = base64.b64encode(buffered.getvalue())
-    return {"image": img_str}
+    return BaseResponse(data={"image": img_str})
