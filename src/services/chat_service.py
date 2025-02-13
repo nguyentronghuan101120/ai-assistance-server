@@ -4,7 +4,7 @@ from utils import function_tools
 from utils.client import openai_client
 
 
-def chat_generate(request: ChatRequest) -> str:
+def chat_generate(request: ChatRequest):
     """
     Generate a complete chat response based on the given prompt.
 
@@ -22,7 +22,7 @@ def chat_generate(request: ChatRequest) -> str:
     )
     
     # Ensure choices exist before accessing message content
-    return completion.choices[0].message.content if completion.choices else ""
+    return completion.choices[0].message
 
 
 def chat_generate_stream(request: ChatStreamRequest) -> AsyncGenerator[str, None]:

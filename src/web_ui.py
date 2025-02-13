@@ -3,7 +3,6 @@ import json
 
 from models.requests.chat_request import ChatRequest
 from services import chat_service, image_service
-from utils import client
 from utils.prompts import system_prompt
 
 
@@ -19,12 +18,12 @@ def chat_logic(message, chat_history):
 
     # Call the OpenAI API.
     bot_message =  chat_service.chat_generate(
-        request=ChatRequest(prompt=messages, is_stream=False)
+        request=ChatRequest(prompt=messages)
     )
 
     # If no completion is returned, raise an exception.
-    if (bot_message is not None):
-        chat_history.append([message, bot_message])
+    if (bot_message.content is not None):
+        chat_history.append([message, bot_message.content])
         yield "", chat_history
 
     # Check if the response has tool_calls (for drawing) or a text response.
@@ -37,8 +36,8 @@ def chat_logic(message, chat_history):
         prompt = function_arguments.get("prompt")
 
         # Gửi thêm 1 message từ phía bot, với hình ảnh đã vẽ
-        image_file = image_service.generate_image_url(prompt)
-        chat_history.append([None, (image_file, prompt)])
+        image_path = image_service.generate_image_url(prompt)
+        chat_history.append([None, (image_path, prompt)])
 
         yield "", chat_history
 

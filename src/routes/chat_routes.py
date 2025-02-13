@@ -21,7 +21,7 @@ def chat(request: ChatRequest):
         data =  chat_service.chat_generate(request=request)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    return BaseResponse(data=data)
+    return BaseResponse(data=data.content)
 
 @router.post("/chat/stream", summary="Stream chat response", response_model_exclude_unset=True)
 async def chat_stream(request: ChatStreamRequest):
