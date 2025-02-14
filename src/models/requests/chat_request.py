@@ -12,16 +12,3 @@ class ChatRequest(BaseModel):
             ]
         }
     }
-
-class ChatStreamRequest(BaseModel):
-    prompt: list[dict]
-    
-    model_config = {
-        "json_schema_extra": {
-            "examples": [
-                {
-                    "prompt": [{"role": "user", "content": "Hello, how are you?"}],
-                }
-            ]
-        }
-    }

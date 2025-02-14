@@ -1,5 +1,5 @@
 from typing import AsyncGenerator
-from models.requests.chat_request import ChatRequest, ChatStreamRequest
+from models.requests.chat_request import ChatRequest
 from utils import function_tools
 from utils.client import openai_client
 
@@ -25,30 +25,25 @@ def chat_generate(request: ChatRequest):
     return completion.choices[0].message
 
 
-def chat_generate_stream(request: ChatStreamRequest) -> AsyncGenerator[str, None]:
+def chat_generate_stream(request: ChatRequest):
     """
     Generate a chat response in a streaming manner.
 
     Args:
-        request (ChatStreamRequest): The chat request containing the prompt.
+        request (ChatRequest): The chat request containing the prompt.
 
     Returns:
         AsyncGenerator[str, None]: An asynchronous generator yielding response chunks.
     """
-    async def event_generator():
-        # Streaming chat response in chunks
-        stream = openai_client.chat.completions.create(
-            messages=request.prompt,
-            model='',  # Specify the model name before using
-            stream=True,
-            tools=function_tools.tools  # Uncomment if tools are required
-        )
-        for chunk in stream:
-            content = chunk.choices[0].delta.content
-            if content:
-                yield content
-
-    return event_generator()
+    # Streaming chat response in chunks
+    stream = openai_client.chat.completions.create(
+        messages=request.prompt,
+        model='',  # Specify the model name before using
+        stream=True,
+        tools=function_tools.tools  # Uncomment if tools are required
+    )
+    
+    return stream
 
 
 async def get_model_info() -> dict:

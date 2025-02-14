@@ -23,6 +23,28 @@ class FunctionTool:
 
 generate_image_tool = FunctionTool(generate_image_url)
 
+# tools = [
+#     generate_image_tool.to_dict()
+# ]
+
 tools = [
-    generate_image_tool.to_dict()
+    {
+        "type": "function",
+        "function":{
+    "name": "generate_image",
+    "description": "Creates an image based on the specified prompt using DiffusionPipeline",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "prompt": {
+                "type": "string",
+                "description": "The prompt used for generate the image (must be in English)",
+            },
+        },
+        "required": ["prompt"],
+        "additionalProperties": False,
+    }
+},
+        "strict": True
+    }
 ]
