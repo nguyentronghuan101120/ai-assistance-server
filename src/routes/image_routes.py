@@ -6,7 +6,7 @@ from models.requests.image_request import ImageRequest
 from models.responses.base_response import BaseResponse
 from services import image_service
 
-router = APIRouter()
+router = APIRouter(tags=["Image"])
 
 @router.post("/generate/")
 async def generate_image(imgRequest: ImageRequest):

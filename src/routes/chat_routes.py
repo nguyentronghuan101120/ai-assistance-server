@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
-from models.requests.chat_request import ChatRequest, ChatStreamRequest
+from models.requests.chat_request import ChatRequest
 from models.responses.base_response import BaseResponse
 from services import chat_service
 
@@ -24,7 +24,7 @@ def chat(request: ChatRequest):
     return BaseResponse(data=data.content)
 
 @router.post("/chat/stream", summary="Stream chat response", response_model_exclude_unset=True)
-async def chat_stream(request: ChatStreamRequest):
+async def chat_stream(request: ChatRequest):
     """
     Stream a chat response based on the given prompt for real-time updates.
 
@@ -35,11 +35,17 @@ async def chat_stream(request: ChatStreamRequest):
         StreamingResponse: A stream of the generated chat response.
     """
     try:
-        response = chat_service.chat_generate_stream(request=request)
+        stream = chat_service.chat_generate_stream(request=request)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    return StreamingResponse(response, media_type='text/event-stream')
+    
+    async def event_generator():
+        for chunk in stream:
+            content = chunk.choices[0].delta.content
+            if content:
+                yield content
 
+    return StreamingResponse(event_generator(), media_type='text/event-stream')
 @router.get("/get-model-info/", response_model=BaseResponse, summary="Retrieve model information")
 async def get_model_info():
     """

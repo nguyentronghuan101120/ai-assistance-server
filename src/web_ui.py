@@ -39,7 +39,7 @@ def chat_logic(message, chat_history):
             chat_history.append([message, "Please wait while I'm drawing..."])
             yield "", chat_history
 
-        if hasattr(delta, 'tool_calls') and delta.tool_calls:
+        if getattr(delta, 'tool_calls', None):
             tool_calls = delta.tool_calls
             for tool_call in tool_calls:
                 index = tool_calls.index(tool_call)
@@ -53,7 +53,8 @@ def chat_logic(message, chat_history):
             function_arguments = json.loads(tool_call.function.arguments)
             prompt = function_arguments.get("prompt")
             image_path = image_service.generate_image_url(prompt)
-            chat_history.append([None, "This is the image I've drawn for you, please enjoy it!"])
+            chat_history.pop()
+            chat_history.append([None, "This is the image I've created for you, please enjoy it!"])
             chat_history.append([None, (image_path, prompt)])
             yield "", chat_history
 
