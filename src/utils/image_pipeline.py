@@ -8,8 +8,7 @@ _device = (
     else "cpu"
 )
 torch.backends.cuda.matmul.allow_tf32 = True  # Enable TF32 for performance on CUDA
-# _model_id = "stable-diffusion-v1-5/stable-diffusion-v1-5"
-_model_id = "stabilityai/sdxl-turbo"
+_model_id = "stable-diffusion-v1-5/stable-diffusion-v1-5"
 
 
 # Load the pipeline lazily
