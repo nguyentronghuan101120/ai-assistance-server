@@ -1,3 +1,4 @@
+import os
 import time
 import torch
 from PIL.Image import Image
@@ -22,7 +23,7 @@ async def generate_image(imgRequest: ImageRequest) -> Image:
     except Exception as e:
         raise RuntimeError(f"Failed to generate image: {e}")
     
-def generate_image_url(prompt: str, width: int = 512, height: int = 512, guidance_scale: float = 7.5, num_inference_steps: int = 30) -> str:
+def generate_image_url(prompt: str, width: int = 512, height: int = 512, guidance_scale: float = 7.5, num_inference_steps: int = 25) -> str:
     """
     Creates an image based on the specified prompt using DiffusionPipeline
     :param prompt: The prompt used for generate the image (must be in English)
@@ -32,6 +33,9 @@ def generate_image_url(prompt: str, width: int = 512, height: int = 512, guidanc
     :param num_inference_steps: The number of inference steps
     :output: URL of the new image
     """
+    # Ensure the outputs directory exists
+    output_dir = "outputs"
+    os.makedirs(output_dir, exist_ok=True)
     try:
         image = image_pipeline.pipeline(
             prompt=prompt,
