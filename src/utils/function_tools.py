@@ -1,50 +1,45 @@
-import inspect
-
-from pydantic import TypeAdapter
-
-from services.image_service import generate_image_url
-
-class FunctionTool:
-    def __init__(self, function, name=None):
-        self.function = function
-        self.name = name or function.__name__
-        self.description = inspect.getdoc(function)
-        self.parameters = TypeAdapter(function).json_schema()
-
-    def to_dict(self):
-        return {
-            "type": "function",
-            "function": {
-                "name": self.name,
-                "description": self.description,
-                "parameters": self.parameters
-            }
-        }
-
-generate_image_tool = FunctionTool(generate_image_url)
-
-# tools = [
-#     generate_image_tool.to_dict()
-# ]
-
-tools = [
-    {
+def create_tool(name, description, properties, required=None, strict=False):
+    tool = {
         "type": "function",
-        "function":{
-    "name": "generate_image",
-    "description": "Creates an image based on the specified prompt using DiffusionPipeline",
-    "parameters": {
-        "type": "object",
-        "properties": {
-            "prompt": {
-                "type": "string",
-                "description": "The prompt used for generate the image (must be in English)",
+        "function": {
+            "name": name,
+            "description": description,
+            "parameters": {
+                "type": "object",
+                "properties": properties,
             },
         },
-        "required": ["prompt"],
-        "additionalProperties": False,
     }
-},
-        "strict": True
-    }
+    if required:
+        tool["function"]["parameters"]["required"] = required
+    if strict:
+        tool["strict"] = True
+    return tool
+
+
+tools = [
+    create_tool(
+        name="generate_image",
+        description="Creates an image based on the specified prompt using DiffusionPipeline",
+        properties={
+            "prompt": {
+                "type": "string",
+                "description": "The prompt used for generating the image (must be in English)",
+            },
+        },
+    ),
+    create_tool(
+        name="get_current_weather",
+        description="Get the current weather in a given location",
+        properties={
+            "location": {"type": "string", "description": "The city name"},
+            "unit": {
+                "type": "string",
+                "enum": ["celsius", "fahrenheit"],
+                "description": "The temperature unit",
+            },
+        },
+        required=["location", "unit"],
+        strict=True,
+    ),
 ]
