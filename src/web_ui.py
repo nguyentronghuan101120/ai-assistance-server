@@ -53,7 +53,6 @@ def chat_logic(message, chat_history):
             function_arguments = json.loads(tool_call.function.arguments)
             prompt = function_arguments.get("prompt")
             image_path = image_service.generate_image_url(prompt)
-            chat_history.pop()
             chat_history.append([None, "This is the image I've created for you, please enjoy it!"])
             chat_history.append([None, (image_path, prompt)])
             yield "", chat_history
@@ -62,9 +61,9 @@ def chat_logic(message, chat_history):
 
 try:
     with gr.Blocks() as demo:
-        gr.Markdown("# Chatbot bằng ChatGPT")
-        message = gr.Textbox(label="Nhập tin nhắn của bạn:")
-        chatbot = gr.Chatbot(label="Chat Bot siêu thông minh", height=600)
+        gr.Markdown("# My smart AI chatbot")
+        message = gr.Textbox(label="Enter your message:")
+        chatbot = gr.Chatbot(label="My smart AI chatbot", height=600)
         message.submit(chat_logic, [message, chatbot], [message, chatbot])
 
     demo.launch(share=True, allowed_paths=["../outputs"])
