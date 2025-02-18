@@ -2,7 +2,7 @@ import gradio as gr
 import json
 
 from models.requests.chat_request import ChatRequest
-from services import chat_service, image_service
+from services import chat_service, image_service, weather_service
 from utils.prompts import system_prompt
 
 def chat_logic(message, chat_history):
@@ -34,9 +34,9 @@ def chat_logic(message, chat_history):
             chat_history[-1][1] += delta.content
             yield "", chat_history
 
-        if chat_history[-1][1].startswith("[TOOL_REQUEST"):
+        if isinstance(chat_history[-1][1], str) and "TOOL_REQUEST" in chat_history[-1][1]:
             chat_history.pop()
-            chat_history.append([message, "Please wait while I'm drawing..."])
+            chat_history.append([message, "Please wait while I'm request a tool..."])
             yield "", chat_history
 
         if getattr(delta, 'tool_calls', None):
@@ -50,11 +50,22 @@ def chat_logic(message, chat_history):
 
     if final_tool_calls:
         for index, tool_call in final_tool_calls.items():
-            function_arguments = json.loads(tool_call.function.arguments)
-            prompt = function_arguments.get("prompt")
-            image_path = image_service.generate_image_url(prompt)
-            chat_history.append([None, "This is the image I've created for you, please enjoy it!"])
-            chat_history.append([None, (image_path, prompt)])
+            chat_history[-1][1] = "" 
+            if tool_call.function.name == "get_current_weather":
+                function_arguments = json.loads(tool_call.function.arguments)
+                location = function_arguments.get("location")
+                unit = function_arguments.get("unit")
+                weather = weather_service.get_weather(location, unit)
+                chat_history.append([None, weather])
+            elif tool_call.function.name == "generate_image":
+                function_arguments = json.loads(tool_call.function.arguments)
+                prompt = function_arguments.get("prompt")
+                chat_history.append([None, "Please wait while I'm generating the image..."])
+                yield "", chat_history
+                image_path = image_service.generate_image_url(prompt)
+                chat_history[-1][1] = "" 
+                chat_history.append([None, "This is the image I've created for you, please enjoy it!"])
+                chat_history.append([None, (image_path, prompt)])
             yield "", chat_history
 
     return "", chat_history
