@@ -14,13 +14,16 @@ RUN apt-get update && \
     git \
     && rm -rf /var/lib/apt/lists/*
 
+RUN mkdir -p /tmp/cache /tmp/vector_store /.cache && \
+chown -R 1000:1000 /tmp /.cache
+
 # 2. Copy requirements và thư viện local
 COPY requirements_for_server.txt ./
-COPY local_packages_for_server/ /tmp/local_packages_for_server/
+# COPY local_packages_for_server/ /tmp/local_packages_for_server/
 
 # 3. Cài đặt gói từ local
-RUN pip install --no-cache-dir --find-links=/tmp/local_packages_for_server -r requirements_for_server.txt
-
+# RUN pip install --no-cache-dir --find-links=/tmp/local_packages_for_server -r requirements_for_server.txt
+RUN pip install --no-cache-dir -r requirements_for_server.txt
 # 4. Copy mã nguồn
 COPY src/ .
 

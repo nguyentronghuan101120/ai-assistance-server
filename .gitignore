@@ -16,3 +16,4 @@ bitsandbytes/*
 llama-cpp-python/*
 local_packages_for_win/*
 llama.cpp/*
+local_packages_for_server/*
