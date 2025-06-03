@@ -3,12 +3,6 @@ from threading import Thread
 from typing import Generator, List
 import uuid
 
-from constants.config import (
-    LLM_MODEL_NAME,
-    TORCH_DEVICE,
-    USE_QUANT,
-    MODEL_OPTIMIZATION,
-)
 
 from utils.timing import measure_time
 from utils.tools import tools_define
@@ -32,6 +26,13 @@ def load_model():
         from transformers.models.auto.tokenization_auto import AutoTokenizer
         from transformers.generation.streamers import TextIteratorStreamer
         from transformers.utils.quantization_config import BitsAndBytesConfig
+        from constants.config import (
+            LLM_MODEL_NAME,
+            TORCH_DEVICE,
+            USE_QUANT,
+            MODEL_OPTIMIZATION,
+        )
+
     except ImportError:
         raise ImportError(
             "transformers is not installed. Please install it using 'pip install transformers'."

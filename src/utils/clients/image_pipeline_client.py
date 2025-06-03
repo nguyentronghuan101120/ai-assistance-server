@@ -1,4 +1,4 @@
-from constants.config import IMAGE_MODEL_ID_OR_LINK, TORCH_DEVICE
+from constants.config import IMAGE_MODEL_ID_OR_LINK
 from utils.timing import measure_time
 
 

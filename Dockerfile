@@ -1,18 +1,28 @@
-FROM python:3.11-slim
+
+FROM nvidia/cuda:12.9.0-runtime-ubuntu22.04
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
+    PYTHONUNBUFFERED=1 \
+    DEBIAN_FRONTEND=noninteractive \
+    LD_LIBRARY_PATH=/usr/local/cuda/lib64:/usr/local/cuda/compat:$LD_LIBRARY_PATH
 
 WORKDIR /src
 
-# 1. Cài các package cần thiết
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    build-essential \
-    cmake \
-    libglib2.0-0 \
-    git \
-    && rm -rf /var/lib/apt/lists/*
+# Install Python 3.11 and dependencies
+RUN apt-get update && apt-get install -y software-properties-common && \
+    add-apt-repository ppa:deadsnakes/ppa && \
+    apt-get update && apt-get install -y \
+        python3.11 \
+        python3.11-distutils \
+        python3.11-venv \
+        python3-pip \
+        cuda-toolkit-12-9 \
+        cuda-runtime-12-9 \
+    && mkdir -p /etc/OpenCL/vendors \
+    && echo "libnvidia-opencl.so.1" > /etc/OpenCL/vendors/nvidia.icd \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && ln -sf /usr/bin/python3.11 /usr/bin/python3
 
 RUN mkdir -p /tmp/cache /tmp/vector_store /.cache && \
 chown -R 1000:1000 /tmp /.cache
@@ -29,4 +39,4 @@ COPY src/ .
 
 # 5. Expose và chạy app
 EXPOSE 7860
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "7860"]
