@@ -9,15 +9,9 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 WORKDIR /src
 
 # Install Python 3.11 and dependencies
-RUN apt-get update && apt-get install -y software-properties-common && \
-    add-apt-repository ppa:deadsnakes/ppa && \
-    apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y \
         python3.11 \
-        python3.11-distutils \
-        python3.11-venv \
         python3-pip \
-        cuda-toolkit-12-9 \
-        cuda-runtime-12-9 \
     && mkdir -p /etc/OpenCL/vendors \
     && echo "libnvidia-opencl.so.1" > /etc/OpenCL/vendors/nvidia.icd \
     && apt-get clean \
@@ -33,7 +27,7 @@ COPY requirements_for_server.txt ./
 
 # 3. Cài đặt gói từ local
 # RUN pip install --no-cache-dir --find-links=/tmp/local_packages_for_server -r requirements_for_server.txt
-RUN pip install --no-cache-dir -r requirements_for_server.txt
+RUN pip install -r requirements_for_server.txt
 # 4. Copy mã nguồn
 COPY src/ .
 
