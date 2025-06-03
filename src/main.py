@@ -16,10 +16,10 @@ from utils.exception import CustomException
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     try:
-        # transformer_client.load_model()
+        transformer_client.load_model()
         # vector_store_client.load_vector_store_client()
         # image_pipeline_client.load_pipeline()
-        llama_cpp_client.load()
+        # llama_cpp_client.load()
         # pass
 
     except Exception as e:
