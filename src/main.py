@@ -24,7 +24,7 @@ async def lifespan(app: FastAPI):
 
     except Exception as e:
         print(f"Error during startup: {str(e)}")
-        raise e
+        # raise e
 
     yield
     # transformer_client.clear_resources()

@@ -1,5 +1,7 @@
 fastapi[standard] == 0.114.0
 uvicorn == 0.34.2
+requests == 2.32.3
+huggingface-hub == 0.32.0
 
 # If use diffusers
 # diffusers == 0.33.1
@@ -12,10 +14,8 @@ uvicorn == 0.34.2
 # bitsandbytes -f ./local_packages_for_server/bitsandbytes-0.46.0-cp311-cp311-linux_x86_64.whl
 
 # # If use llama-cpp-python
-# llama-cpp-python== 0.3.8
-# --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cu124
-
-https://huggingface.co/LeoNguyen101120/my-wheel/resolve/main/llama_cpp_python-0.3.9-cp311-cp311-linux_x86_64.whl
+https://github.com/abetlen/llama-cpp-python/releases/download/v0.3.4-cu124/llama_cpp_python-0.3.4-cp311-cp311-linux_x86_64.whl
+# ./local_packages_for_server/llama-cpp-python
 
 # If process file feature enable
 # beautifulsoup4 == 4.13.4

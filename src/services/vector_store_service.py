@@ -1,4 +1,4 @@
-from constants.config import VECTOR_STORE_DIR, EMBEDDING_MODEL, TORCH_DEVICE
+from constants.config import VECTOR_STORE_DIR, EMBEDDING_MODEL
 from utils.clients import vector_store_client
 
 
