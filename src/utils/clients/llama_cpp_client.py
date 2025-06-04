@@ -27,31 +27,17 @@ def load():
             "llama_cpp is not installed. Please install it using 'pip install llama-cpp-python'."
         )
 
+
     global _llm
 
-    # _llm = llama_cpp.Llama.from_pretrained(
-    #     repo_id=GGUF_REPO_ID,
-    #     filename=GGUF_FILE_NAME,
-    #     n_threads=os.cpu_count(),
-    #     n_gpu_layers=-1,
-    #     n_ctx=4096,
-    #     verbose=True,
-    #     use_mlock=True,
-    #     use_mmap=True,
-    #     # messages_to_prompt=messages_to_prompt,
-    #     # completion_to_prompt=completion_to_prompt,
-    # )
-
-    _llm = llama_cpp.Llama(
-        model_path=f"./.cache/{GGUF_FILE_NAME}",
+    _llm = llama_cpp.Llama.from_pretrained(
+        repo_id=GGUF_REPO_ID,
+        filename=GGUF_FILE_NAME,
         n_threads=os.cpu_count(),
         n_gpu_layers=-1,
-        n_ctx=4096,
+        n_ctx=16384,
         verbose=True,
-        use_mlock=True,
         use_mmap=True,
-        # messages_to_prompt=messages_to_prompt,
-        # completion_to_prompt=completion_to_prompt,
     )
 
 

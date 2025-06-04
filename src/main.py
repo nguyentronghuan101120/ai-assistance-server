@@ -12,6 +12,7 @@ from routes import chat_routes, process_file_routes, vector_store_routes
 from utils.clients import (
     image_pipeline_client,
     llama_cpp_client,
+    open_ai_client,
     transformer_client,
     vector_store_client,
 )
@@ -25,6 +26,7 @@ async def lifespan(app: FastAPI):
         vector_store_client.load_vector_store_client()
         image_pipeline_client.load_pipeline()
         llama_cpp_client.load()
+        # open_ai_client.load_open_ai_client()
         # pass
 
     except Exception as e:

@@ -4,12 +4,12 @@ from constants.config import OUTPUT_DIR
 from utils.clients import image_pipeline_client
 
 negative_promt = "blurry, distorted, pixelated, incomplete, poorly drawn, misaligned, weird proportions, bad perspective, unnatural colors, noisy, out of focus, glitchy, unsharp, overexposed, underexposed, poorly lit, bad composition, excessive noise, oversaturated, too dark, too bright, inconsistent lighting, discolored, overly stylized, unrealistic, awkward pose, unbalanced, mismatched, distorted features, flat, unnatural texture, chaotic, unreadable, incoherent, asymmetrical, low quality, lowres, wrong anatomy, bad anatomy, deformed, disfigured, ugly"
-width = 64
-height = 64
+width = 512
+height = 512
 guidance_scale = 7.5
-num_inference_steps = 1
+num_inference_steps = 30
 
-base_url = "http://0.0.0.0:7860"
+base_url = "http://leonguyen101120.zapto.org:7860"
 
 
 def generate_image_url(prompt: str) -> str:

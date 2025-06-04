@@ -4,7 +4,6 @@ IS_APPLE_SILICON = torch.backends.mps.is_available()
 IS_CUDA_AVAILABLE = torch.cuda.is_available()
 
 TORCH_DEVICE = "cuda" if IS_CUDA_AVAILABLE else "mps" if IS_APPLE_SILICON else "cpu"
-
 # Enable quantization for CPU/MPS
 USE_QUANT = IS_CUDA_AVAILABLE
 
