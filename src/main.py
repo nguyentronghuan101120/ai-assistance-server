@@ -9,26 +9,32 @@ from fastapi.staticfiles import StaticFiles
 from constants.config import OUTPUT_DIR
 from models.responses.base_response import BaseResponse
 from routes import chat_routes, process_file_routes, vector_store_routes
-from utils.clients import image_pipeline_client, llama_cpp_client, transformer_client, vector_store_client
+from utils.clients import (
+    image_pipeline_client,
+    llama_cpp_client,
+    transformer_client,
+    vector_store_client,
+)
 from utils.exception import CustomException
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     try:
-        transformer_client.load_model()
-        # vector_store_client.load_vector_store_client()
-        # image_pipeline_client.load_pipeline()
-        # llama_cpp_client.load()
+        # transformer_client.load_model()
+        vector_store_client.load_vector_store_client()
+        image_pipeline_client.load_pipeline()
+        llama_cpp_client.load()
         # pass
 
     except Exception as e:
         print(f"Error during startup: {str(e)}")
-        # raise e
+        raise e
 
     yield
-    # transformer_client.clear_resources()
-    # image_pipeline_client.clear_resources()
+    transformer_client.clear_resources()
+    image_pipeline_client.clear_resources()
+    llama_cpp_client.clear_resources()
 
 
 app = FastAPI(lifespan=lifespan)

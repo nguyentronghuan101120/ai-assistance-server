@@ -77,11 +77,22 @@ src/
 
 ### Prerequisites
 
-- Python 3.x
-- FastAPI
-- Uvicorn
+- Python 3.11
+- CUDA 12.9.0 (for GPU acceleration)
+- FastAPI 0.114.0
+- Uvicorn 0.34.2
 
 ### Installation
+
+1. Clone the repository
+2. Create a virtual environment:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+```
+
+3. Install dependencies:
 
 ```bash
 pip install -r requirements.txt
@@ -89,21 +100,53 @@ pip install -r requirements.txt
 
 ### Running the Application
 
+#### Local Development
+
 ```bash
 uvicorn main:app --reload --port 8080
 ```
 
-The application will be available at `http://localhost:8080`
+#### Docker Deployment
+
+```bash
+# Build the Docker image
+docker build -t ai-assistance-server .
+
+# Run the container
+docker run -p 7860:7860 --gpus all ai-assistance-server
+```
+
+The application will be available at:
+
+- Local: `http://localhost:7860`
+- Server: `http://0.0.0.0:7860` or https://leonguyen101120-ai-assistance.hf.space
 
 ## Development
 
-- Modular architecture: routes, services, models, utils
-- Environment variables required for some services (e.g., Brave, Jina API keys)
+### Key Dependencies
 
-### Create and run docker file
+- **AI/ML**:
 
-docker build -t ai-assistance-server .
-docker run -p 80:80 ai-assistance-server
+  - diffusers 0.33.1
+  - transformers 4.52.4
+  - torch 2.7.0
+  - accelerate 1.6.0
+
+- **File Processing** (Optional):
+  - beautifulsoup4 4.13.4
+  - langchain_chroma 0.2.2
+  - langchain_huggingface 0.1.2
+  - langchain_community 0.3.19
+  - chromadb 0.6.3
+  - pymupdf 1.25.1
+
+### Environment Variables
+
+The following environment variables are required for specific features:
+
+- Brave Search API key (for web search)
+- Jina API key (for web content reading)
+- HuggingFace API key (for model access)
 
 ## License
 

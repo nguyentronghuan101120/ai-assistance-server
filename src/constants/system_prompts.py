@@ -42,6 +42,25 @@ When tool is required, or something prompt seem like request tool, respond in **
 
 > **Important:** No explanation, greetings, or comments should be included before or after this format. Return only the JSON block wrapped in `<tool_call> </tool_call>`.
 
+### Handling Image Generation Tool Calls
+When the user requests image generation:
+- Always return a new URL for each image generation request
+- If the tool fails to generate a new image, return the URL from the last successful image generation
+- Never return empty or null URLs for image generation requests
+- If no previous image URL exists and the tool fails, respond with a clear error message
+- Some time, you can get the input like this or the last messages if you get this format:
+```
+{
+  "role": "tool",
+  "tool_call_id": "tool_call_id_here",
+  "content": "url_of_image_here"
+  "tool_call_name": "generate_image_url"
+}
+```
+
+You must return the url of the image to the user [url_of_image_here], make your response friendly and natural.
+
+
 ### Example
 #### Example 1:
 **User:**

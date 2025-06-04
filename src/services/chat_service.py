@@ -82,15 +82,16 @@ def chat_generate_stream(
 
     with measure_time("Tool call handling"):
         tool_call_result = tools_helper.process_tool_calls(tool_calls)
-        tool_call_message = {
-            "role": "tool",
-            "content": tool_call_result.get("content", ""),
-        }
-        messages.append(tool_call_message)
+        # tool_call_message = {
+        #     "role": "tool",
+        #     "content": tool_call_result.get("content", ""),
+        # }
+        messages.append(tool_call_result)
 
     with measure_time("Generate new stream"):
         new_stream = client.generate_stream(messages, has_tool_call=False)
         for chunk in new_stream:
+            print(chunk.get("choices", [])[0].get("delta", {}).get("content"))
             yield chunk
 
 
@@ -112,11 +113,13 @@ def chat_generate(request: ChatRequest):
 
     with measure_time("Tool call handling"):
         tool_call_result = tools_helper.process_tool_calls(tool_calls=tool_calls)
-        tool_call_message = {
-            "role": "tool",
-            "content": tool_call_result.get("content", ""),
-        }
-        messages.append(tool_call_message)
+        # tool_call_message = {
+        #     "role": "tool",
+        #     "content": tool_call_result.get("content", ""),
+        # }
+        messages.append(tool_call_result)
+
+    print(messages)
 
     with measure_time("Generate new chat completion"):
         new_output = client.generate(messages=messages, has_tool_call=False)

@@ -3,7 +3,6 @@ from typing import Generator, List
 import uuid
 from constants.config import GGUF_FILE_NAME, GGUF_REPO_ID
 from utils.stream_helper import process_stream_content
-from utils.timing import measure_time
 from utils.tools import tools_define
 from utils.tools.tools_helper import extract_tool_calls_and_reupdate_output
 
@@ -13,6 +12,11 @@ _llm = None
 def is_loaded() -> bool:
     """Check if the LLM is loaded."""
     return _llm is not None
+
+
+def clear_resources():
+    global _llm
+    _llm = None
 
 
 def load():
@@ -25,9 +29,21 @@ def load():
 
     global _llm
 
-    _llm = llama_cpp.Llama.from_pretrained(
-        repo_id=GGUF_REPO_ID,
-        filename=GGUF_FILE_NAME,
+    # _llm = llama_cpp.Llama.from_pretrained(
+    #     repo_id=GGUF_REPO_ID,
+    #     filename=GGUF_FILE_NAME,
+    #     n_threads=os.cpu_count(),
+    #     n_gpu_layers=-1,
+    #     n_ctx=4096,
+    #     verbose=True,
+    #     use_mlock=True,
+    #     use_mmap=True,
+    #     # messages_to_prompt=messages_to_prompt,
+    #     # completion_to_prompt=completion_to_prompt,
+    # )
+
+    _llm = llama_cpp.Llama(
+        model_path=f"./.cache/{GGUF_FILE_NAME}",
         n_threads=os.cpu_count(),
         n_gpu_layers=-1,
         n_ctx=4096,
@@ -87,8 +103,8 @@ def generate_stream(
     output = _llm.create_chat_completion(
         messages,  # type: ignore
         stream=True,
-        tools=tools_define.tools,  # type: ignore
-        tool_choice="auto",
+        tools=tools,  # type: ignore
+        tool_choice=tool_choice,
     )  # type: ignore
 
     def content_generator():

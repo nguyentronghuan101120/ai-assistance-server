@@ -1,26 +1,29 @@
 fastapi[standard] == 0.114.0
 uvicorn == 0.34.2
 requests == 2.32.3
+huggingface-hub == 0.32.0
 
-# # If use diffusers
+# If use diffusers
 diffusers == 0.33.1
 accelerate == 1.6.0
-transformers == 4.52.4
+# transformers == 4.52.4
 torch==2.7.0
---extra-index-url https://download.pytorch.org/whl/cu128
 
-# Offline install for windows
-bitsandbytes -f ./local_packages_for_win/bitsandbytes-0.46.0-cp311-cp311-win_amd64.whl
+# # If use bitsandbytes with cuda 
+# https://github.com/bitsandbytes-foundation/bitsandbytes/releases/download/continuous-release_main/bitsandbytes-1.33.7.preview-py3-none-manylinux_2_24_x86_64.whl
 
-# If use llama-cpp-python
-# llama-cpp-python -f ./local_packages_for_win/llama_cpp_python-0.3.9-cp311-cp311-win_amd64.whl
+# # If use llama-cpp-python with cuda 
+# https://github.com/abetlen/llama-cpp-python/releases/download/v0.3.4-cu124/llama_cpp_python-0.3.4-cp311-cp311-linux_x86_64.whl
+
+# # If use llama-cpp-python CPU
+llama-cpp-python == 0.3.9
 
 # If process file feature enable
-# beautifulsoup4 == 4.13.4
-# requests == 2.32.3
-# langchain_chroma == 0.2.2
-# langchain_huggingface == 0.1.2
-# langchain_community == 0.3.19
-# chromadb == 0.6.3
-# pymupdf == 1.25.1
+beautifulsoup4 == 4.13.4
+requests == 2.32.3
+langchain_chroma == 0.2.2
+langchain_huggingface == 0.1.2
+langchain_community == 0.3.19
+chromadb == 0.6.3
+pymupdf == 1.25.1
 
