@@ -38,6 +38,7 @@ def load():
         n_ctx=16384,
         verbose=True,
         use_mmap=True,
+        cache_prompt=False
     )
 
 

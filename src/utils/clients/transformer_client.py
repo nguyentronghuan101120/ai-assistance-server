@@ -4,6 +4,7 @@ from typing import Generator, List
 import uuid
 
 
+from constants.config import TORCH_DEVICE
 from utils.timing import measure_time
 from utils.tools import tools_define
 

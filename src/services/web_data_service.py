@@ -1,11 +1,6 @@
 import requests
-from dotenv import load_dotenv
-import os
 
-load_dotenv('.env.local')  # Specify the correct file name
-
-jina_api_key = os.getenv("jina_api_key")
-brave_search_api_key = os.getenv("brave_search_api_key")
+from constants.config import BRAVE_SEARCH_API_KEY, JINA_API_KEY
 
 #TODO: Use this for free search
 # def search_web_with_duckduckgo(search_query: str) -> list[dict[str, str]]:
@@ -76,7 +71,7 @@ def web_search_with_3rd_party(search_query: str) -> list[dict[str, str]]:
     headers = {
         "Accept": "application/json",
         "Accept-Encoding": "gzip",
-        "X-Subscription-Token": brave_search_api_key
+        "X-Subscription-Token": BRAVE_SEARCH_API_KEY
     }
     
     params = {
@@ -124,7 +119,7 @@ def read_web_url(url: str) -> str:
     try:
         response = requests.get(
             f"https://r.jina.ai/{url}",
-            headers={"Authorization": f"Bearer {jina_api_key}"}
+            headers={"Authorization": f"Bearer {JINA_API_KEY}"}
         )
         response.raise_for_status()  # Raise an error for bad responses
         content = response.text

@@ -21,9 +21,6 @@ def load_pipeline():
             "diffusers is not installed. Please install it using 'pip install diffusers'."
         )
         
-    print(TORCH_DEVICE)
-    
-
     with measure_time("Load image pipeline"):
         pipeline = StableDiffusionPipeline.from_pretrained(
             IMAGE_MODEL_ID_OR_LINK,

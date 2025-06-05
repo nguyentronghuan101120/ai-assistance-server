@@ -1,4 +1,5 @@
-from constants.config import VECTOR_STORE_DIR, EMBEDDING_MODEL
+from langchain_chroma import Chroma
+from constants.config import VECTOR_STORE_DIR
 from utils.clients import vector_store_client
 
 
@@ -17,7 +18,7 @@ def inspect_collection(collection_id: str):
 
 def get_vector_store(collection_name) :
     if collection_name not in vector_store:
-        vector_store[collection_name] = vector_store_client.chroma.Chroma(
+        vector_store[collection_name] = Chroma(
             persist_directory=VECTOR_STORE_DIR,
             collection_name=collection_name,
             embedding_function=vector_store_client.embeddings_function,
