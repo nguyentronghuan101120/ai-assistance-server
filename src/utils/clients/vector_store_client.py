@@ -1,5 +1,4 @@
-global persistent_client, embeddings_function
-
+global persistent_client, embeddings_function, chroma
 
 def load_vector_store_client():
     try:
@@ -12,9 +11,10 @@ def load_vector_store_client():
             "chromadb, langchain_chroma, langchain_huggingface are not installed"
         )
 
-    global persistent_client, embeddings_function
+    global persistent_client, embeddings_function, chroma
     persistent_client = PersistentClient(path=VECTOR_STORE_DIR)
     embeddings_function = HuggingFaceEmbeddings(
         model_name=EMBEDDING_MODEL,
         model_kwargs={"device": TORCH_DEVICE},
     )
+
